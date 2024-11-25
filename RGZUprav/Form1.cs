@@ -30,6 +30,7 @@ namespace RGZUprav
             player2Wins = 0;
             player1Wins = 0;
             totalGamesPlayed = 0;
+            gameLengths.Clear();
 
             // Получаем вероятность поведения Игрока 1
             if (double.TryParse(winPercent.Text, out double probability) && probability >= 0 && probability <= 1)
@@ -58,6 +59,7 @@ namespace RGZUprav
 
                 bool gameOver = false; // Флаг окончания игры
                 int roundsPlayed = 0; // Количество раундов в текущей игре
+                currentLevelPlayer2 = 0; // Сброс позиции Игрока 2
 
                 for (int round = 1; round <= totalRounds; round++)
                 {
@@ -80,23 +82,14 @@ namespace RGZUprav
                     if (currentLevelPlayer2 == 5)
                     {
                         player2Wins++;
-                        gameOver = true; // Игрок 2 победил, игра окончена                     
-                        gameLengths.Add(round); // Добавляем количество раундов до победы
-                        //MessageBox.Show("2");
+                        gameOver = true; // Игрок 2 победил, игра окончена                      
+                        gameLengths.Add(roundsPlayed); // Добавляем количество раундов до победы
                         break;
-                    }
-
-                    // Проверка победы Игрока 1
-                    if (round == totalRounds)
-                    {
-                        player1Wins++;
-                        gameLengths.Add(round); // Добавляем количество раундов до победы Игрока 1
-                        //MessageBox.Show("1");
                     }
                 }
 
                 // Если после 25 раундов Игрок 2 не победил, то победу засчитываем Игроку 1
-                if (!gameOver && totalRounds > 0)
+                if (!gameOver)
                 {
                     player1Wins++;
                     gameLengths.Add(totalRounds); // Добавляем, что игра закончилась после 25 раундов
@@ -119,18 +112,15 @@ namespace RGZUprav
             double averageRounds = gameLengths.Count > 0 ? gameLengths.Average() : 0;
 
             // Обновление статистики на форме
-            Player1WinPercentageLabel.Text = $"Процент побед 1 игрока: {player1WinPercentage}%";
-            Player2WinPercentageLabel.Text = $"Процент побед 2 игрока: {player2WinPercentage}%";
+            Player1WinPercentageLabel.Text = $"Процент побед 1 игрока: {player1WinPercentage:F2}%";
+            Player2WinPercentageLabel.Text = $"Процент побед 2 игрока: {player2WinPercentage:F2}%";
             AverageGameLengthLabel.Text = $"Средняя длина партии: {averageRounds:F2} раундов";
         }
 
         private void PredefinedSequenceRadioButton_CheckedChanged(object sender, EventArgs e)
         {
             // Показываем FlowLayoutPanel только при выборе PredefinedSequenceRadioButton
-            if(PredefinedSequenceRadioButton.Checked)
-                flowLayoutPanel1.Visible = true;
-            else flowLayoutPanel1.Visible = false;
-
+            flowLayoutPanel1.Visible = PredefinedSequenceRadioButton.Checked;
         }
 
         private bool GetPlayer2Agreement(int round)
